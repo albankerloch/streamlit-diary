@@ -4,17 +4,25 @@ import altair as alt
 import pandas as pd
 import streamlit as st
 
+import mysql.connector
+import os
+from dotenv import load_dotenv
+
+load_dotenv()
+password="test"
+password=os.getenv('DATABASE_PASSWORD')
+print(password)
+
 HERE = os.path.dirname(os.path.abspath(__file__))
 
-st.title("Top 5%" " income share")
-st.markdown("Share of income received by the richest 5%" " of the population.")
-DATA = os.path.join(HERE, "data.csv")
+st.title("Mes Heures")
+st.write(f"Share : {password}")
 
+DATA = os.path.join(HERE, "data.csv")
 
 @st.cache_data
 def load_data(nrows):
     return pd.read_csv("./data.csv", nrows=nrows)
-
 
 data_load_state = st.text("Loading data...")
 data = load_data(10000)
