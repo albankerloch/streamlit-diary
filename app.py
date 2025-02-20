@@ -1,12 +1,11 @@
 import os.path
-
 import altair as alt
 import pandas as pd
 import streamlit as st
-
 import mysql.connector
 import os
 from dotenv import load_dotenv
+import plotly.express as px
 
 load_dotenv()
 password=os.getenv('DATABASE_PASSWORD')
@@ -25,7 +24,7 @@ def load_data():
         password=password,
         database='diary'
     )
-    query='SELECT * FROM diary.raw_data'
+    query='SELECT date, duree_totale FROM diary.raw_data where date > (NOW() - INTERVAL 3 MONTH)'
     df = pd.read_sql(query, conn)
     conn.close()
     return df
@@ -33,6 +32,11 @@ def load_data():
 data_load_state = st.text("Loading data...")
 data = load_data()
 data_load_state.text("")
+
+fig = px.line(data, x='date', y='duree_totale', labels={'date': 'Date', 'duree_totale': 'Travail (heures)'}, title='Travail par jour')
+
+# Afficher le graphique dans Streamlit
+st.plotly_chart(fig)
 
 if st.checkbox("Show raw data"):
     st.subheader("Raw data")
