@@ -16,7 +16,6 @@ st.title("Mes Heures")
 
 DATA = os.path.join(HERE, "data.csv")
 
-@st.cache_data
 def load_data():
     conn = mysql.connector.connect(
         host='diary-database.c1igk0esk62c.eu-west-3.rds.amazonaws.com',
