@@ -16,6 +16,7 @@ st.title("Mes Heures")
 
 DATA = os.path.join(HERE, "data.csv")
 
+@st.cache_data
 def load_data():
     conn = mysql.connector.connect(
         host='diary-database.c1igk0esk62c.eu-west-3.rds.amazonaws.com',
@@ -23,8 +24,9 @@ def load_data():
         password=password,
         database='diary'
     )
-    query='SELECT date, duree_totale FROM diary.raw_data where date > (NOW() - INTERVAL 3 MONTH)'
+    query='SELECT date, duree_totale FROM diary.raw_data where date > (NOW() - INTERVAL 2 MONTH)'
     df = pd.read_sql(query, conn)
+    df['duree_heure'] = df['duree_totale'].dt.total_seconds() / 3600 
     conn.close()
     return df
 
@@ -32,7 +34,7 @@ data_load_state = st.text("Loading data...")
 data = load_data()
 data_load_state.text("")
 
-fig = px.line(data, x='date', y='duree_totale', labels={'date': 'Date', 'duree_totale': 'Travail (heures)'}, title='Travail par jour')
+fig = px.line(data, x='date', y='duree_heure', labels={'date': 'Date', 'duree_heure': 'Travail (heures)'}, title='Travail par jour')
 
 # Afficher le graphique dans Streamlit
 st.plotly_chart(fig)
