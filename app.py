@@ -24,7 +24,7 @@ def load_data():
         password=password,
         database='diary'
     )
-    query='SELECT date, duree_totale FROM diary.raw_data where date > (NOW() - INTERVAL 2 MONTH)'
+    query='SELECT distinct date, duree_totale FROM diary.raw_data where date > (NOW() - INTERVAL 2)'
     df = pd.read_sql(query, conn)
     df['duree_heure'] = df['duree_totale'].dt.total_seconds() / 3600 
     conn.close()
@@ -34,10 +34,18 @@ data_load_state = st.text("Loading data...")
 data = load_data()
 data_load_state.text("")
 
-fig = px.line(data, x='date', y='duree_heure', labels={'date': 'Date', 'duree_heure': 'Travail (heures)'}, title='Travail par jour')
+chart = (
+    alt.Chart(data).mark_area(
+    color="lightblue",
+    interpolate='step-after',
+    line=True
+).encode(
+    x='date',
+    y='duree_heure'
+)
+)
 
-# Afficher le graphique dans Streamlit
-st.plotly_chart(fig)
+st.altair_chart(chart, use_container_width=True)
 
 if st.checkbox("Show raw data"):
     st.subheader("Raw data")
