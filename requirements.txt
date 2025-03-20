@@ -4,3 +4,7 @@ altair
 mysql-connector-python 
 python-dotenv
 plotly
+july
+matplotlib
+calplot
+setuptools
