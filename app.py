@@ -6,6 +6,10 @@ import mysql.connector
 import os
 from dotenv import load_dotenv
 import plotly.express as px
+import numpy as np; np.random.seed(sum(map(ord, 'calmap')))
+import pandas as pd
+import calmap
+import matplotlib.pyplot as plt
 
 load_dotenv()
 password=os.getenv('DATABASE_PASSWORD')
@@ -24,7 +28,7 @@ def load_data():
         password=password,
         database='diary'
     )
-    query='SELECT date, duree_totale FROM diary.raw_data where date > (NOW() - INTERVAL 2 MONTH)'
+    query='SELECT DISTINCT date, duree_totale, brossette FROM diary.raw_data where date > (NOW() - INTERVAL 2 MONTH)'
     df = pd.read_sql(query, conn)
     df['duree_heure'] = df['duree_totale'].dt.total_seconds() / 3600 
     conn.close()
@@ -34,10 +38,21 @@ data_load_state = st.text("Loading data...")
 data = load_data()
 data_load_state.text("")
 
+data_brossette = data[['date', 'brossette']]
+data_brossette.set_index('date', inplace=True)
+
 fig = px.line(data, x='date', y='duree_heure', labels={'date': 'Date', 'duree_heure': 'Travail (heures)'}, title='Travail par jour')
 
-# Afficher le graphique dans Streamlit
+# Afficher le graphique
 st.plotly_chart(fig)
+
+# Afficher le calendrier
+fig_brossette, ax = calmap.calendarplot(data_brossette['brossette'], 
+    daylabels=['Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi', 'Dimanche'],
+    monthlabels=['Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin', 'Juillet', 'Août', 'Septembre', 'Octobre', 'Novvembre', 'Décembre'],
+    cmap='YlGn', 
+    fig_kws={'figsize': (12, 4)})
+st.pyplot(fig_brossette)
 
 if st.checkbox("Show raw data"):
     st.subheader("Raw data")

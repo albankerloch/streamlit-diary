@@ -1,10 +1,9 @@
 streamlit
 pandas
-altair
 mysql-connector-python 
 python-dotenv
 plotly
-july
 matplotlib
-calplot
+calmap
+numpy
 setuptools
