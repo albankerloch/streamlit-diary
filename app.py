@@ -24,7 +24,7 @@ def load_data():
         password=password,
         database='diary'
     )
-    query='SELECT distinct date, duree_totale FROM diary.raw_data where date > (NOW() - INTERVAL 2)'
+    query='SELECT distinct date, duree_totale FROM diary.raw_data where date > (NOW() - INTERVAL 2 WEEK)'
     df = pd.read_sql(query, conn)
     df['duree_heure'] = df['duree_totale'].dt.total_seconds() / 3600 
     conn.close()
