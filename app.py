@@ -1,15 +1,17 @@
 import os.path
-import altair as alt
 import pandas as pd
 import streamlit as st
 import mysql.connector
 import os
+import calmap as calmap
 from dotenv import load_dotenv
 import plotly.express as px
 import numpy as np; np.random.seed(sum(map(ord, 'calmap')))
 import pandas as pd
-import calmap
 import matplotlib.pyplot as plt
+import july
+from july.utils import date_range
+
 
 load_dotenv()
 password=os.getenv('DATABASE_PASSWORD')
@@ -28,7 +30,7 @@ def load_data():
         password=password,
         database='diary'
     )
-    query='SELECT DISTINCT date, duree_totale, brossette FROM diary.raw_data where date > (NOW() - INTERVAL 2 MONTH)'
+    query="SELECT DISTINCT date, duree_totale, brossette FROM diary.raw_data where date >= STR_TO_DATE('01/03/2025', '%d/%m/%Y') "
     df = pd.read_sql(query, conn)
     df['duree_heure'] = df['duree_totale'].dt.total_seconds() / 3600 
     conn.close()
@@ -53,6 +55,20 @@ fig_brossette, ax = calmap.calendarplot(data_brossette['brossette'],
     cmap='YlGn', 
     fig_kws={'figsize': (12, 4)})
 st.pyplot(fig_brossette)
+
+## Create data
+dates_july = date_range("2025-03-01", "2025-03-20")
+data_july = np.random.randint(0, 100, len(dates_july))
+
+## Create a figure with a single axes
+fig, ax = plt.subplots()
+
+## Tell july to make a plot in a specific axes
+july.month_plot(dates_july, data_brossette['brossette'], month=3, date_label=True, ax=ax, colorbar=True)
+
+st.title("📊 A `july.month_plot()` in streamlit")
+## Tell streamlit to display the figure
+st.pyplot(fig)
 
 if st.checkbox("Show raw data"):
     st.subheader("Raw data")
