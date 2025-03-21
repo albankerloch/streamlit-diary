@@ -10,15 +10,10 @@ import numpy as np; np.random.seed(sum(map(ord, 'calmap')))
 import pandas as pd
 import calmap
 import matplotlib.pyplot as plt
+import requests
 
 load_dotenv()
 password=os.getenv('DATABASE_PASSWORD')
-
-HERE = os.path.dirname(os.path.abspath(__file__))
-
-st.title("Mes Heures")
-
-DATA = os.path.join(HERE, "data.csv")
 
 @st.cache_data
 def load_data():
@@ -34,7 +29,24 @@ def load_data():
     conn.close()
     return df
 
-data_load_state = st.text("Loading data...")
+api_url = "https://rdvdej6yilynmf5byxza4id4ke0vhplq.lambda-url.eu-west-3.on.aws/"
+
+def call_lambda_function():
+    try:
+        response = requests.post(api_url)
+        if response.status_code == 200:
+            st.success("Données mises à jour !")
+        else:
+            st.error(f"Erreur lors de l'appel de la fonction Lambda: {response.status_code}")
+    except Exception as e:
+        st.error(f"Erreur: {e}")
+
+st.title("Mes Heures")
+
+if st.button("Mise à jour"):
+    call_lambda_function()
+
+data_load_state = st.text("Chargement des données ...")
 data = load_data()
 data_load_state.text("")
 
@@ -43,15 +55,14 @@ data_brossette.set_index('date', inplace=True)
 
 fig = px.line(data, x='date', y='duree_heure', labels={'date': 'Date', 'duree_heure': 'Travail (heures)'}, title='Travail par jour')
 
-# Afficher le graphique
 st.plotly_chart(fig)
 
-# Afficher le calendrier
 fig_brossette, ax = calmap.calendarplot(data_brossette['brossette'], 
     daylabels=['Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi', 'Dimanche'],
     monthlabels=['Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin', 'Juillet', 'Août', 'Septembre', 'Octobre', 'Novvembre', 'Décembre'],
     cmap='YlGn', 
     fig_kws={'figsize': (12, 4)})
+
 st.pyplot(fig_brossette)
 
 if st.checkbox("Show raw data"):
