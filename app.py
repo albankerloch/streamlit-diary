@@ -66,7 +66,6 @@ fig, ax = plt.subplots()
 ## Tell july to make a plot in a specific axes
 july.month_plot(dates_july, data_brossette['brossette'], month=3, date_label=True, ax=ax, colorbar=True)
 
-st.title("📊 A `july.month_plot()` in streamlit")
 ## Tell streamlit to display the figure
 st.pyplot(fig)
 
