@@ -11,6 +11,7 @@ import pandas as pd
 import calmap
 import matplotlib.pyplot as plt
 import requests
+import time
 
 load_dotenv()
 password=os.getenv('DATABASE_PASSWORD')
@@ -45,6 +46,8 @@ st.title("Mes Heures")
 
 if st.button("Mise à jour"):
     call_lambda_function()
+    load_data.clear()
+    st.rerun()
 
 data_load_state = st.text("Chargement des données ...")
 data = load_data()
