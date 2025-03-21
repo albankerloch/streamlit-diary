@@ -33,6 +33,7 @@ def load_data():
     query="SELECT DISTINCT date, duree_totale, brossette FROM diary.raw_data where date >= DATE_FORMAT(NOW(), '%Y-%m-01')"
     df = pd.read_sql(query, conn)
     df['duree_heure'] = df['duree_totale'].dt.total_seconds() / 3600 
+    df['date'] = pd.to_datetime(df['date']).dt.strftime('%Y-%m-%d')
     conn.close()
     return df
 
@@ -40,14 +41,11 @@ data_load_state = st.text("Loading data...")
 data = load_data()
 data_load_state.text("")
 
-data_brossette = data[['date', 'brossette']]
-data_brossette['date'] = pd.to_datetime(data_brossette['date']).dt.strftime('%Y-%m-%d')
-
 fig = px.line(data, x='date', y='duree_heure', labels={'date': 'Date', 'duree_heure': 'Travail (heures)'}, title='Travail par jour')
 st.plotly_chart(fig)
 
 fig_brossette, ax = plt.subplots()
-july.month_plot(data_brossette['date'], data_brossette['brossette'], month=3, date_label=True, ax=ax, colorbar=True)
+july.month_plot(data['date'], data['brossette'], month=3, date_label=True, ax=ax, colorbar=True)
 st.pyplot(fig_brossette)
 
 if st.checkbox("Show raw data"):
