@@ -16,7 +16,7 @@ from datetime import datetime
 load_dotenv()
 password=os.getenv('DATABASE_PASSWORD')
 
-st.title("Mes Heures")
+st.title("Journ-Alban")
 
 @st.cache_data
 def load_data():
@@ -36,7 +36,11 @@ def load_data():
 with st.spinner('Chargement des données...'):
     data = load_data()
 
-fig = px.line(data, x='date', y='duree_heure', labels={'date': 'Date', 'duree_heure': 'Travail (heures)'}, title='Travail par jour')
+fig = px.bar(data, x='date', y='duree_heure', labels={'date': 'Date', 'duree_heure': 'Travail (heures)'}, title='')
+fig.update_xaxes(
+    dtick="D1",
+    tickformat="%d",
+    ticklabelmode="instant")
 st.plotly_chart(fig)
 
 fig_brossette, ax = plt.subplots()
