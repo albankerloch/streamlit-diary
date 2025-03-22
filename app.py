@@ -1,20 +1,23 @@
 import os.path
-import altair as alt
 import pandas as pd
 import streamlit as st
 import mysql.connector
 import os
+import calmap as calmap
 from dotenv import load_dotenv
 import plotly.express as px
 import numpy as np; np.random.seed(sum(map(ord, 'calmap')))
 import pandas as pd
-import calmap
 import matplotlib.pyplot as plt
 import requests
 import time
+from matplotlib.colors import ListedColormap
+import july
+from datetime import datetime
 
 load_dotenv()
 password=os.getenv('DATABASE_PASSWORD')
+
 
 @st.cache_data
 def load_data():
@@ -24,9 +27,10 @@ def load_data():
         password=password,
         database='diary'
     )
-    query='SELECT DISTINCT date, duree_totale, brossette FROM diary.raw_data where date > (NOW() - INTERVAL 2 MONTH)'
+    query="SELECT DISTINCT date, duree_totale, brossette, manger FROM diary.raw_data where date >= DATE_FORMAT(NOW(), '%Y-%m-01')"
     df = pd.read_sql(query, conn)
-    df['duree_heure'] = df['duree_totale'].dt.total_seconds() / 3600 
+    df['duree_heure'] = df['duree_totale'].dt.total_seconds() / 3600
+    df['date'] = pd.to_datetime(df['date']).dt.strftime('%Y-%m-%d')
     conn.close()
     return df
 
@@ -42,31 +46,34 @@ def call_lambda_function():
     except Exception as e:
         st.error(f"Erreur: {e}")
 
-st.title("Mes Heures")
+st.title("Journ-Alban")
 
 if st.button("Mise à jour"):
     call_lambda_function()
     load_data.clear()
     st.rerun()
 
-data_load_state = st.text("Chargement des données ...")
-data = load_data()
-data_load_state.text("")
+with st.spinner('Chargement des données...'):
+    data = load_data()
 
-data_brossette = data[['date', 'brossette']]
-data_brossette.set_index('date', inplace=True)
-
-fig = px.line(data, x='date', y='duree_heure', labels={'date': 'Date', 'duree_heure': 'Travail (heures)'}, title='Travail par jour')
-
+fig = px.bar(data, x='date', y='duree_heure', labels={'date': 'Date', 'duree_heure': 'Travail (heures)'}, title='')
+fig.update_xaxes(
+    dtick="D1",
+    tickformat="%d",
+    ticklabelmode="instant")
 st.plotly_chart(fig)
 
-fig_brossette, ax = calmap.calendarplot(data_brossette['brossette'], 
-    daylabels=['Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi', 'Dimanche'],
-    monthlabels=['Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin', 'Juillet', 'Août', 'Septembre', 'Octobre', 'Novvembre', 'Décembre'],
-    cmap='YlGn', 
-    fig_kws={'figsize': (12, 4)})
+col1, col2 = st.columns(2)
 
-st.pyplot(fig_brossette)
+with col1:
+    fig_brossette, ax = plt.subplots()
+    july.month_plot(data['date'], data['brossette'], cmap= ListedColormap(["#F5F5F5", "#FFFFE5", "green"]), weeknum_label=False, fontfamily="monospace", date_label=True, ax=ax)
+    st.pyplot(fig_brossette)
+
+with col2:
+    fig_manger, ax = plt.subplots()
+    july.month_plot(data['date'], data['manger'], cmap=ListedColormap(["#F5F5F5", "#FFFFE5", "green"]), weeknum_label=False, fontfamily="monospace", date_label=True, ax=ax)
+    st.pyplot(fig_manger)
 
 if st.checkbox("Show raw data"):
     st.subheader("Raw data")
