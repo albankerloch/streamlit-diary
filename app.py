@@ -43,13 +43,17 @@ fig.update_xaxes(
     ticklabelmode="instant")
 st.plotly_chart(fig)
 
-fig_brossette, ax = plt.subplots()
-july.month_plot(data['date'], data['brossette'], cmap= ListedColormap(["#F5F5F5", "#FFFFE5", "green"]), weeknum_label=False, fontfamily="monospace", date_label=True, ax=ax)
-st.pyplot(fig_brossette)
+col1, col2 = st.columns(2)
 
-fig_manger, ax = plt.subplots()
-july.month_plot(data['date'], data['manger'], cmap=ListedColormap(["#F5F5F5", "#FFFFE5", "green"]), weeknum_label=False, fontfamily="monospace", date_label=True, ax=ax)
-st.pyplot(fig_manger)
+with col1:
+    fig_brossette, ax = plt.subplots()
+    july.month_plot(data['date'], data['brossette'], cmap= ListedColormap(["#F5F5F5", "#FFFFE5", "green"]), weeknum_label=False, fontfamily="monospace", date_label=True, ax=ax)
+    st.pyplot(fig_brossette)
+
+with col2:
+    fig_manger, ax = plt.subplots()
+    july.month_plot(data['date'], data['manger'], cmap=ListedColormap(["#F5F5F5", "#FFFFE5", "green"]), weeknum_label=False, fontfamily="monospace", date_label=True, ax=ax)
+    st.pyplot(fig_manger)
 
 if st.checkbox("Show raw data"):
     st.subheader("Raw data")
