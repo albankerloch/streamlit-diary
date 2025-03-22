@@ -8,3 +8,4 @@ calmap
 numpy
 setuptools
 requests
+git+https://github.com/thoellrich/july.git@fix-mpl.cbook.MatplotlibDepreciationWarning
