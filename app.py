@@ -9,9 +9,9 @@ import plotly.express as px
 import numpy as np; np.random.seed(sum(map(ord, 'calmap')))
 import pandas as pd
 import matplotlib.pyplot as plt
+from matplotlib.colors import ListedColormap
 import july
 from datetime import datetime
-
 
 load_dotenv()
 password=os.getenv('DATABASE_PASSWORD')
@@ -26,7 +26,7 @@ def load_data():
         password=password,
         database='diary'
     )
-    query="SELECT DISTINCT date, duree_totale, brossette FROM diary.raw_data where date >= DATE_FORMAT(NOW(), '%Y-%m-01')"
+    query="SELECT DISTINCT date, duree_totale, brossette, manger FROM diary.raw_data where date >= DATE_FORMAT(NOW(), '%Y-%m-01')"
     df = pd.read_sql(query, conn)
     df['duree_heure'] = df['duree_totale'].dt.total_seconds() / 3600
     df['date'] = pd.to_datetime(df['date']).dt.strftime('%Y-%m-%d')
@@ -44,8 +44,12 @@ fig.update_xaxes(
 st.plotly_chart(fig)
 
 fig_brossette, ax = plt.subplots()
-july.month_plot(data['date'], data['brossette'], cmap="github", weeknum_label=False, fontfamily="monospace", date_label=True, ax=ax)
+july.month_plot(data['date'], data['brossette'], cmap= ListedColormap(["#F5F5F5", "#FFFFE5", "green"]), weeknum_label=False, fontfamily="monospace", date_label=True, ax=ax)
 st.pyplot(fig_brossette)
+
+fig_manger, ax = plt.subplots()
+july.month_plot(data['date'], data['manger'], cmap=ListedColormap(["#F5F5F5", "#FFFFE5", "green"]), weeknum_label=False, fontfamily="monospace", date_label=True, ax=ax)
+st.pyplot(fig_manger)
 
 if st.checkbox("Show raw data"):
     st.subheader("Raw data")
