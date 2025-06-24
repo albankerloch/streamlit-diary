@@ -7,4 +7,3 @@ matplotlib
 calmap
 numpy
 setuptools
-streamlit-date-picker
