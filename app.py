@@ -8,6 +8,8 @@ import plotly.express as px
 import numpy as np; np.random.seed(sum(map(ord, 'calmap')))
 import pandas as pd
 import matplotlib.pyplot as plt
+import requests
+import time
 from matplotlib.colors import ListedColormap
 import july
 from datetime import datetime
@@ -68,6 +70,25 @@ def load_data(startdate = datetime.now()):
         df['date'] = pd.to_datetime(df['date']).dt.strftime('%Y-%m-%d')
     conn.close()
     return df
+
+api_url = "https://rdvdej6yilynmf5byxza4id4ke0vhplq.lambda-url.eu-west-3.on.aws/"
+
+def call_lambda_function():
+    try:
+        response = requests.post(api_url)
+        if response.status_code == 200:
+            st.success("Données mises à jour !")
+        else:
+            st.error(f"Erreur lors de l'appel de la fonction Lambda: {response.status_code}")
+    except Exception as e:
+        st.error(f"Erreur: {e}")
+
+st.title("Journ-Alban")
+
+if st.button("Mise à jour"):
+    call_lambda_function()
+    load_data.clear()
+    st.rerun()
 
 with st.spinner('Chargement des données...'):
     data = load_data(startdate = st.session_state.start_date)

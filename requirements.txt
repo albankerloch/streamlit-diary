@@ -8,3 +8,5 @@ calmap
 numpy
 setuptools
 python-dateutil
+requests
+git+https://github.com/thoellrich/july.git@fix-mpl.cbook.MatplotlibDepreciationWarning
