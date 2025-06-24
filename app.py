@@ -18,7 +18,7 @@ password=os.getenv('DATABASE_PASSWORD')
 
 style = "<style>h1 {text-align: center;}</style>"
 st.markdown(style, unsafe_allow_html=True)
-style2 = "<style>h2 {text-align: center;}</style>"
+style2 = "<style>h3 {text-align: center;}</style>"
 st.markdown(style2, unsafe_allow_html=True)
 
 st.title("Journ-Alban")
@@ -38,7 +38,7 @@ with col1:
     st.markdown('</div>', unsafe_allow_html=True)
 
 with col2:
-    st.header(st.session_state.start_date.strftime('%B %Y'))
+    st.markdown(f"### {st.session_state.start_date.strftime('%B %Y')}")
 
 with col3:    
     st.markdown('<div class="vertical-align">', unsafe_allow_html=True)
@@ -62,6 +62,9 @@ def load_data(startdate = datetime.now()):
     df = pd.read_sql(query, conn)
     if len(df) != 0:
         df['duree_heure'] = df['duree_totale'].dt.total_seconds() / 3600
+        date_range = pd.date_range(start=pd.to_datetime(max(df['date'])) + relativedelta(days=1), end=pd.to_datetime(enddate) - relativedelta(days=1))
+        dt = pd.DataFrame(date_range, columns=['date'])
+        df = pd.merge(dt, df, on='date', how='outer')
         df['date'] = pd.to_datetime(df['date']).dt.strftime('%Y-%m-%d')
     conn.close()
     return df
@@ -74,6 +77,7 @@ fig.update_xaxes(
     dtick="D1",
     tickformat="%d",
     ticklabelmode="instant")
+fig.update_yaxes(range=[0, 10])
 st.plotly_chart(fig)
 
 col1, col2 = st.columns(2)
@@ -81,12 +85,13 @@ col1, col2 = st.columns(2)
 with col1:
     fig_brossette, ax = plt.subplots()
     july.month_plot(data['date'], data['brossette'], cmap= ListedColormap(["#F5F5F5", "#FFFFE5", "green"]), weeknum_label=False, fontfamily="monospace", date_label=True, ax=ax)
+    ax.set_title("Brossette")
     st.pyplot(fig_brossette)
 
-with col2:
-    fig_manger, ax = plt.subplots()
-    july.month_plot(data['date'], data['manger'], cmap=ListedColormap(["#F5F5F5", "#FFFFE5", "green"]), weeknum_label=False, fontfamily="monospace", date_label=True, ax=ax)
-    st.pyplot(fig_manger)
+# with col2:
+#     fig_manger, ax = plt.subplots()
+#     july.month_plot(data['date'], data['manger'], cmap=ListedColormap(["#F5F5F5", "#FFFFE5", "green"]), weeknum_label=False, fontfamily="monospace", date_label=True, ax=ax)
+#     st.pyplot(fig_manger)
 
 if st.checkbox("Show raw data"):
     st.subheader("Raw data")
