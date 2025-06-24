@@ -7,3 +7,4 @@ matplotlib
 calmap
 numpy
 setuptools
+python-dateutil
