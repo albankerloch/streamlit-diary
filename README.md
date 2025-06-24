@@ -1,7 +1,16 @@
 # streamlit-diary
 
-https://altair-viz.github.io/gallery/filled_step_chart.html
+# infra used
 
+https://connect.posit.cloud/albankerloch
+(alban.kerloch@gmail.com)
+
+AWS
+(unknown account)
+
+# defore launching
+
+Write the database password in the .env file (the usual password)
 
 # to launch
 
@@ -16,3 +25,7 @@ pip install -U git+https://github.com/thoellrich/july.git@fix-mpl.cbook.Matplotl
 streamlit run app.py
 
 (ou sur gcp : streamlit run app.py --browser.serverAddress=localhost --server.enableCORS=false --server.enableXsrfProtection=false)
+
+# useful links
+
+https://altair-viz.github.io/gallery/filled_step_chart.html
