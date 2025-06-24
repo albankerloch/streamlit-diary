@@ -83,12 +83,6 @@ def call_lambda_function():
     except Exception as e:
         st.error(f"Erreur: {e}")
 
-st.title("Journ-Alban")
-
-if st.button("Mise à jour"):
-    call_lambda_function()
-    load_data.clear()
-    st.rerun()
 
 with st.spinner('Chargement des données...'):
     data = load_data(startdate = st.session_state.start_date)
@@ -109,7 +103,11 @@ with col1:
     ax.set_title("Brossette")
     st.pyplot(fig_brossette)
 
-# with col2:
+with col2:
+    if st.button("Mise à jour"):
+        call_lambda_function()
+        load_data.clear()
+        st.rerun()
 #     fig_manger, ax = plt.subplots()
 #     july.month_plot(data['date'], data['manger'], cmap=ListedColormap(["#F5F5F5", "#FFFFE5", "green"]), weeknum_label=False, fontfamily="monospace", date_label=True, ax=ax)
 #     st.pyplot(fig_manger)
