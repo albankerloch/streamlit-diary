@@ -55,7 +55,7 @@ def load_data(startdate = datetime.now()):
     startdate = startdate.strftime('%Y-%m-01')
     enddate = enddate.strftime('%Y-%m-01')
     conn = mysql.connector.connect(
-        host='diary-database.c1igk0esk62c.eu-west-3.rds.amazonaws.com',
+        host='database-diary.cpyemoe22qos.eu-west-3.rds.amazonaws.com',
         user='alban',
         password=password,
         database='diary'
@@ -71,7 +71,7 @@ def load_data(startdate = datetime.now()):
     conn.close()
     return df
 
-api_url = "https://rdvdej6yilynmf5byxza4id4ke0vhplq.lambda-url.eu-west-3.on.aws/"
+api_url = "https://uesdodghqqvwlvasdmpg76372u0lhgqb.lambda-url.eu-west-3.on.aws/"
 
 def call_lambda_function():
     try:
