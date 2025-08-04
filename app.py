@@ -10,7 +10,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import requests
 import time
-from matplotlib.colors import ListedColormap
+from matplotlib.colors import ListedColormap, BoundaryNorm
 import july
 from datetime import datetime
 from dateutil.relativedelta import relativedelta
@@ -97,9 +97,14 @@ st.plotly_chart(fig)
 
 col1, col2 = st.columns(2)
 
+if data['brossette'].nunique() == 1 and data['brossette'].iloc[0] == 1:
+    colors = ["green"]
+else:
+    colors = ["#F5F5F5", "#FFFFE5", "green"]
+
 with col1:
     fig_brossette, ax = plt.subplots()
-    july.month_plot(data['date'], data['brossette'], cmap= ListedColormap(["#F5F5F5", "#FFFFE5", "green"]), weeknum_label=False, fontfamily="monospace", date_label=True, ax=ax)
+    july.month_plot(data['date'], data['brossette'], cmap=ListedColormap(colors), weeknum_label=False, fontfamily="monospace", date_label=True, ax=ax)
     ax.set_title("Brossette")
     st.pyplot(fig_brossette)
 
