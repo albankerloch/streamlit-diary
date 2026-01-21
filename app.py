@@ -16,7 +16,11 @@ from datetime import datetime
 from dateutil.relativedelta import relativedelta
 
 load_dotenv()
-password=os.getenv('DATABASE_PASSWORD')
+DB_HOST = os.getenv('DB_HOST')
+DB_PORT = os.getenv('DB_PORT')
+DB_USER = os.getenv('DB_USER')
+DB_PASS = os.getenv('DB_PASSWORD')
+DB_NAME = os.getenv('DB_NAME')
 
 style = "<style>h1 {text-align: center;}</style>"
 st.markdown(style, unsafe_allow_html=True)
@@ -48,3 +52,28 @@ with col3:
         st.rerun()
     st.markdown('</div>', unsafe_allow_html=True)
 
+@st.cache_data
+def load_data(startdate = datetime.now()):
+    enddate = startdate + relativedelta(months=1)
+    startdate = startdate.strftime('%Y-%m-01')
+    enddate = enddate.strftime('%Y-%m-01')
+    conn = mysql.connector.connect(
+        host=DB_HOST,
+        port=DB_PORT,
+        user=DB_USER,
+        password=DB_PASS,
+        database=DB_NAME
+    )
+    try:
+        query=f"SELECT DISTINCT date, duree_totale, brossette, manger FROM diary.raw_data where date >= '{startdate}' and date < '{enddate}'"
+        df = pd.read_sql(query, conn)
+        if len(df) != 0:
+            df['duree_heure'] = df['duree_totale'].dt.total_seconds() / 3600
+            date_range = pd.date_range(start=pd.to_datetime(max(df['date'])) + relativedelta(days=1), end=pd.to_datetime(enddate) - relativedelta(days=1))
+            dt = pd.DataFrame(date_range, columns=['date'])
+            df = pd.merge(dt, df, on='date', how='outer')
+            df['date'] = pd.to_datetime(df['date']).dt.strftime('%Y-%m-%d')
+    finally:
+        conn.close()
+    return df
+    
