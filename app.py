@@ -76,4 +76,29 @@ def load_data(startdate = datetime.now()):
     finally:
         conn.close()
     return df
+
+with st.spinner('Chargement des données...'):
+    data = load_data(startdate = st.session_state.start_date)
+
+fig = px.bar(data, x='date', y='duree_heure', labels={'date': 'Date', 'duree_heure': 'Travail (heures)'}, title='')
+fig.update_xaxes(
+    dtick="D1",
+    tickformat="%d",
+    ticklabelmode="instant")
+fig.update_yaxes(range=[0, 10])
+st.plotly_chart(fig)
+
+if data['brossette'].nunique() == 1 and data['brossette'].iloc[0] == 1:
+    colors = ["green"]
+else:
+    colors = ["#F5F5F5", "#FFFFE5", "green"]
+
+fig_brossette, ax = plt.subplots()
+july.month_plot(data['date'], data['brossette'], cmap=ListedColormap(colors), weeknum_label=False, fontfamily="monospace", date_label=True, ax=ax)
+ax.set_title("Brossette")
+st.pyplot(fig_brossette)
+
+if st.checkbox("Show raw data"):
+    st.subheader("Raw data")
+    st.write(data)
     
