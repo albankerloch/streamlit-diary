@@ -65,7 +65,7 @@ def load_data(startdate = datetime.now()):
         database=DB_NAME
     )
     try:
-        query=f"SELECT DISTINCT date, duree_totale, brossette, manger FROM diary.raw_data where date >= '{startdate}' and date < '{enddate}'"
+        query=f"SELECT DISTINCT date, duree_totale, brossette, manger FROM database-diary.raw_data where date >= '{startdate}' and date < '{enddate}'"
         df = pd.read_sql(query, conn)
         if len(df) != 0:
             df['duree_heure'] = df['duree_totale'].dt.total_seconds() / 3600
