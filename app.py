@@ -29,3 +29,22 @@ st.markdown('</div>', unsafe_allow_html=True)
 if 'start_date' not in st.session_state:
     st.session_state.start_date = datetime.now()
 
+col1, col2, col3 = st.columns(3)
+
+with col1:
+    st.markdown('<div class="vertical-align">', unsafe_allow_html=True)
+    if st.button("", icon=":material/arrow_back:", use_container_width=True):
+        st.session_state.start_date = st.session_state.start_date - relativedelta(months=1)
+        st.rerun()
+    st.markdown('</div>', unsafe_allow_html=True)
+
+with col2:
+    st.markdown(f"### {st.session_state.start_date.strftime('%B %Y')}")
+
+with col3:    
+    st.markdown('<div class="vertical-align">', unsafe_allow_html=True)
+    if st.button(" ", icon=":material/arrow_forward:", use_container_width=True):
+        st.session_state.start_date = st.session_state.start_date + relativedelta(months=1)
+        st.rerun()
+    st.markdown('</div>', unsafe_allow_html=True)
+
