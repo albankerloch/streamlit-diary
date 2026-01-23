@@ -78,7 +78,7 @@ def load_data(startdate = datetime.now()):
     return df
 
 def call_update():
-    api_url = "https://uhttp://192.168.1.28:8000/run-sync"
+    api_url = "http://192.168.1.28:8000/run-sync"
     try:
         response = requests.get(api_url)
         if response.status_code == 200:
