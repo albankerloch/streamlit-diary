@@ -29,3 +29,7 @@ streamlit run app.py
 # useful links
 
 https://altair-viz.github.io/gallery/filled_step_chart.html
+
+## Docker
+
+nohup streamlit run app.py --server.port 8501 --server.address 0.0.0.0 > /var/log/streamlit.log 2>&1 &
