@@ -77,6 +77,17 @@ def load_data(startdate = datetime.now()):
         conn.close()
     return df
 
+def call_update():
+    api_url = "https://uhttp://192.168.1.28:8000/run-sync"
+    try:
+        response = requests.get(api_url)
+        if response.status_code == 200:
+            st.success("Données mises à jour !")
+        else:
+            st.error(f"Erreur lors de l'appel de l'api: {response.status_code}")
+    except Exception as e:
+        st.error(f"Erreur: {e}")
+
 with st.spinner('Chargement des données...'):
     data = load_data(startdate = st.session_state.start_date)
 
@@ -88,15 +99,24 @@ fig.update_xaxes(
 fig.update_yaxes(range=[0, 10])
 st.plotly_chart(fig)
 
+col1, col2 = st.columns(2)
+
 if data['brossette'].nunique() == 1 and data['brossette'].iloc[0] == 1:
     colors = ["green"]
 else:
     colors = ["#F5F5F5", "#FFFFE5", "green"]
 
-fig_brossette, ax = plt.subplots()
-july.month_plot(data['date'], data['brossette'], cmap=ListedColormap(colors), weeknum_label=False, fontfamily="monospace", date_label=True, ax=ax)
-ax.set_title("Brossette")
-st.pyplot(fig_brossette)
+with col1:
+    fig_brossette, ax = plt.subplots()
+    july.month_plot(data['date'], data['brossette'], cmap=ListedColormap(colors), weeknum_label=False, fontfamily="monospace", date_label=True, ax=ax)
+    ax.set_title("Brossette")
+    st.pyplot(fig_brossette)
+
+with col2:
+    if st.button("Mise à jour"):
+        call_update()
+        load_data.clear()
+        st.rerun()
 
 if st.checkbox("Show raw data"):
     st.subheader("Raw data")
